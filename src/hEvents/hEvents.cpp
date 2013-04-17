@@ -1,20 +1,20 @@
 
 /*****************************************************************************
- 
+
  Copyright (C) 2011 by Bernard Geyer
- 
+
  http://bernardgeyer.com/
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,7 +22,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
- 
+
  *****************************************************************************/
 
 #include "hEvents.h"
@@ -46,10 +46,10 @@ void hEvents::setup(void)
 
     addListener("setXY", this, &hEvents::setXY);
     addListener("setTime", this, &hEvents::setTime);
-	
+
     addListener("setLabel", this, &hEvents::setLabel);
     addListener("clearLabel", this, &hEvents::clearLabel);
-	
+
     addListener("setText", this, &hEvents::setText);
     addListener("addText", this, &hEvents::addText);
     addListener("clearText", this, &hEvents::clearText);
@@ -60,12 +60,12 @@ void hEvents::setup(void)
 	addListener("clear", this, &hEvents::clear);
 	addListener("display", this, &hEvents::display);
 	addListener("displayWOcr", this, &hEvents::displayWOcr);
-	
+
 
     addListener("select", this, &hEvents::select);
     addListener("unselect", this, &hEvents::unselect);
     addListener("setSelected", this, &hEvents::setSelected);
-	
+
 	addListener("selectElement", this, &hEvents::selectElement);
 	addListener("unselectElement", this, &hEvents::unselectElement);
 	addListener("elementSetSelected", this, &hEvents::elementSetSelected);
@@ -77,13 +77,13 @@ void hEvents::setup(void)
     addListener("bang", this, &hEvents::bang);
 
 // ----------------------------------
-    
+
     addListener("setValueToItem", this, &hEvents::setValueToItem);
     addListener("setValue2ToItem", this, &hEvents::setValue2ToItem);
-	
+
     addListener("openItem", this, &hEvents::openItem);
     addListener("closeItem", this, &hEvents::closeItem);
-	
+
     addListener("answerDialog", this, &hEvents::answerDialog);
 
 	addListener("start", this, &hEvents::start);
@@ -114,17 +114,17 @@ void hEvents::addObject(std::string objectName, hObject * obj)
 hObject * hEvents::getObject(std::string objectName)
 {
 	hSymbol symbol = getSymbol("objects", objectName);
-	
+
 	if(symbol.ID == 0) {
 		cout << "error in hEvents::getObject: unknown object \"" << objectName << "\" in object dictionary" << endl;
 		return NULL;
 	}
-	
+
 	if(symbol.type != H_OBJECT_SYMBOL) {
 		cout << "error in hEvents::getObject: symbol " << objectName << " is not an object " << endl;
 		return NULL;
 	}
-	
+
 	// cout << "hEvents::getObject: found object: " << objectName << endl;
 	return objectMap[symbol.ID];
 }
@@ -214,7 +214,7 @@ void hEvents::sendEvent(std::string dictName, std::string message, hEventArgs &a
 	// Try to split "message" into 2 strings for object and event
 	string objectName, eventName;
 	int splitPoint = message.find_first_of(".");
-	
+
 	if(splitPoint == -1) { // no dot found -> message is the name of the event
 		objectName = "";
 		eventName = message;
@@ -223,53 +223,53 @@ void hEvents::sendEvent(std::string dictName, std::string message, hEventArgs &a
 		objectName = message.substr(0, splitPoint);
 		eventName = message.substr(splitPoint+1);
 	}
-	
+
 	// cout << "message    = " << message    << ", splitPoint = " << splitPoint << endl;
 	// cout << "objectName = " << objectName << ", eventName = "  << eventName << endl;
 
 	// ----------------------------------------------------------------------
-	
+
 	// Check if a valid event exist. Return if not.
 	hSymbol eventSymbol = getSymbol(dictName, eventName);
-	
+
 	if(eventSymbol.ID == 0) {
 		// cout << "error in hEvents::sendEvent: unknown event \"" << eventName << "\" in " << dictName << " dictionary" << endl;
 		return;
 	}
-	
+
 	if(eventSymbol.type != H_EVENT_SYMBOL) {
 		// cout << "error in hEvents::sendEvent: symbol " << eventName << " is not an event " << endl;
 		return;
 	}
-	
+
 	// ----------------------------------------------------------------------
-	
+
 	// Check if a valid object exist. Return if not.
 	if(objectName.size() > 0) {
 		hSymbol objectSymbol = getSymbol("objects", objectName);
-		
+
 		if(objectSymbol.ID == 0) {
 			// cout << "error in hEvents::sendEvent: unknown object " << objectName << endl;
 			return;
 		}
-		
+
 		if(objectSymbol.type != H_OBJECT_SYMBOL) {
 			// cout << "error in hEvents::sendEvent: " << objectName << " is not an object " << endl;
 			return;
 		}
 	}
-	
+
 	// ----------------------------------------------------------------------
-	
+
 	// Store the object where to sent the even
 	args.objectName = objectName;
 
 	// Store the name of the event to be sent
 	args.eventName = eventName;
-	
+
 	// Send the event
 	ofNotifyEvent(*eventMap[eventSymbol.ID], args, this);
-	
+
     if(verbose == true) {
         cout << "sending event ";
         cout << serialize(args, false, 15);
@@ -504,7 +504,7 @@ void hEvents::argTest(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::setValue(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->setValue(args.values[0]);
@@ -512,7 +512,7 @@ void hEvents::setValue(hEventArgs& args)
 }
 
 void hEvents::setValue2(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->setValue2(args.values[0]);
@@ -520,7 +520,7 @@ void hEvents::setValue2(hEventArgs& args)
 }
 
 void hEvents::setXY(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 1) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->setXY(args.values[0], args.values[1]);
@@ -538,7 +538,7 @@ void hEvents::setTime(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::setLabel(hEventArgs& args)
-{	
+{
 	if(args.strings.size() > 0) {
 		string label = args.strings[0];
 		hObject * object = getObject(args.objectName);
@@ -547,7 +547,7 @@ void hEvents::setLabel(hEventArgs& args)
 }
 
 void hEvents::clearLabel(hEventArgs& args)
-{	
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->clearLabel();
 }
@@ -555,7 +555,7 @@ void hEvents::clearLabel(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::setText(hEventArgs& args)
-{	
+{
 	if(args.strings.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) {
@@ -565,7 +565,7 @@ void hEvents::setText(hEventArgs& args)
 }
 
 void hEvents::addText(hEventArgs& args)
-{	
+{
 	if(args.strings.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) {
@@ -585,14 +585,14 @@ void hEvents::clearText(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::open(hEventArgs& args)
-{		
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->open();
 }
 
 
 void hEvents::close(hEventArgs& args)
-{		
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->close();
 }
@@ -601,7 +601,7 @@ void hEvents::close(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::clear(hEventArgs& args)
-{		
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->clear();
 }
@@ -618,7 +618,7 @@ void hEvents::display(hEventArgs& args)
 }
 
 void hEvents::displayWOcr(hEventArgs& args)
-{	
+{
 	if(args.strings.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) {
@@ -652,7 +652,7 @@ void  hEvents::setSelected(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::selectElement(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->selectElement(args.values[0]);
@@ -666,7 +666,7 @@ void  hEvents::unselectElement(hEventArgs& args)
 }
 
 void hEvents::elementSetSelected(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->elementSetSelected(args.values[0], args.values[1]);
@@ -676,7 +676,7 @@ void hEvents::elementSetSelected(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::selectItem(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->selectItem(args.values[0]);
@@ -690,7 +690,7 @@ void  hEvents::unselectItem(hEventArgs& args)
 }
 
 void hEvents::itemSetSelected(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->itemSetSelected(args.values[0], args.values[1]);
@@ -700,9 +700,9 @@ void hEvents::itemSetSelected(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::bang(hEventArgs& args)
-{	
+{
 	// cout << "hEvents::bang" << endl;
-	
+
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->bang();
 }
@@ -713,7 +713,7 @@ void hEvents::bang(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::setValueToItem(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 1) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->setValueToItem(args.values[0], args.values[1]);
@@ -721,7 +721,7 @@ void hEvents::setValueToItem(hEventArgs& args)
 }
 
 void hEvents::setValue2ToItem(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 1) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->setValue2ToItem(args.values[0], args.values[1]);
@@ -731,7 +731,7 @@ void hEvents::setValue2ToItem(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::openItem(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->openItem(args.values[0]);
@@ -739,7 +739,7 @@ void hEvents::openItem(hEventArgs& args)
 }
 
 void hEvents::closeItem(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->closeItem(args.values[0]);
@@ -747,7 +747,7 @@ void hEvents::closeItem(hEventArgs& args)
 }
 
 void hEvents::answerDialog(hEventArgs& args)
-{	
+{
 	if(args.values.size() > 0) {
 		hObject * object = getObject(args.objectName);
 		if(object != NULL) object->answerDialog(args.values[0]);
@@ -757,21 +757,21 @@ void hEvents::answerDialog(hEventArgs& args)
 // ---------------------------------------------------------------
 
 void hEvents::start(hEventArgs& args)
-{		
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->start();
 }
 
 
 void hEvents::stop(hEventArgs& args)
-{		
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->stop();
 }
 
 
 void hEvents::cont(hEventArgs& args)
-{		
+{
 	hObject * object = getObject(args.objectName);
 	if(object != NULL) object->cont();
 }

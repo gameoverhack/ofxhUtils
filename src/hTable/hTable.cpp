@@ -30,7 +30,7 @@
 #include <iostream>
 using namespace std;
 
-#if !defined( __APPLE_CC__ )
+#if defined( __WIN32__ ) || defined( _WIN32 )
 #include <float.h>
 #endif
 

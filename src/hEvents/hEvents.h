@@ -1,20 +1,20 @@
 
 /*****************************************************************************
- 
+
  Copyright (C) 2011 by Bernard Geyer
- 
+
  http://bernardgeyer.com/
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,7 +22,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
- 
+
  *****************************************************************************/
 
 #ifndef _HEVENTS
@@ -63,20 +63,20 @@ typedef ofEvent<hEventArgs>  hEvent;
 
 class hEvents : public hSymbols {
 // singleton class hEvents
-	
+
 private:
 	static hEvents * _events;
-	
+
 	// Private constructor / destructor :
     hEvents()  {}
 	~hEvents() {}
-	
+
 	std::map < unsigned int, hObject * > objectMap;
 	// This map hold the objects to which to send when the corresponding string is found in it
-	
+
 	std::map < unsigned int, ofEvent<hEventArgs>* > eventMap;
 	// This map hold the events to send when the corresponding string is found in it
-	
+
 public :
 	// Public constructor :
 	static hEvents * getInstance() {
@@ -85,12 +85,12 @@ public :
         }
         return _events;
     }
-		
+
 	// ---------------------------------------------------------------
 
 	void setup(void);
 	// Initialize the event system and the default listeners
-	
+
 	void addObject(std::string objectName, hObject * obj);
 	// Create a symbol that represent an object and add the event to the object map
 	// Used to send messages to a specific object
@@ -117,50 +117,50 @@ public :
 
     hEvent * getEvent(std::string eventName);
 	// Return an event using the selected dictionary
-	
+
     void disable(void);
 	// Disable the sending of events
-	
+
 	void enable(void);
 	// Enable the sending of events (default)
 
 	void set_verbose(bool flag);
 	// Display sent messages on the console if this flag is set
-	
+
 	//------------------------------------------
 
     void sendEvent(std::string dictName, std::string message, hEventArgs &args);
 	// Send an event (parameters are given in &args)
 	// Can be send to a specific object f.e. message = "obj.method"
 	// Or to any object that has this method  f.e. message = "method"
-	
+
 	// The event has to be created before (generally with addListener), else it does nothing
 	// The eventual object has to be created before too
-	
+
 	// Warning: if the listener of the event need value parameters,
 	// it should ALWAYS verify the number of received parameters!
 	// The listener can decide which parameters are usefull and ignore others
-	
-	// There are 2 kind of parameters: 
+
+	// There are 2 kind of parameters:
 	// doubles (stored in the vector args.values)
 	// strings (stored in the vector args.strings)
-	
+
 	// The listener has also to call the method of the right object
 	// by checking args.objectName
-	
+
     void sendEvent(std::string message, hEventArgs &args);
 	// Send an event using the selected dictionary
-	
+
 	// ---------------------------------------------------------------
 	// Sending event using different numbers of parameters:
 	// ---------------------------------------------------------------
-	
+
     void sendEvent(std::string message);
     void sendEvent(std::string message, double val);
     void sendEvent(std::string message, double val1, double val2);
     void sendEvent(std::string message, double val1, double val2, double val3);
     void sendEvent(std::string message, double val1, double val2, double val3, double val4);
-	
+
     void sendEvent(std::string message, std::ostringstream &oss);
 	// Uses a string stream argument as string parameter
 	// Clear also the string stream when finished
@@ -170,13 +170,13 @@ public :
     void sendEvent(std::string message, std::string s, double val1, double val2);
     void sendEvent(std::string message, std::string s, double val1, double val2, double val3);
     void sendEvent(std::string message, std::string s, double val1, double val2, double val3, double val4);
-	
+
     void sendEvent(std::string message, std::string s1, std::string s2);
     void sendEvent(std::string message, std::string s1, std::string s2, double val);
     void sendEvent(std::string message, std::string s1, std::string s2, double val1, double val2);
     void sendEvent(std::string message, std::string s1, std::string s2, double val1, double val2, double val3);
     void sendEvent(std::string message, std::string s1, std::string s2, double val1, double val2, double val3, double val4);
-	
+
 	// ---------------------------------------------------------------
 
 	template <typename TArgumentsType, class TListenerClass>
@@ -187,7 +187,7 @@ public :
     // Ask a method of an object to respond to an event
     // If the event does not exist, create it first
     // An event can be connected to more than one responder
-	
+
 	template <typename TArgumentsType, class TListenerClass>
     void addListener(std::string eventName, TListenerClass  * listener, void (TListenerClass::*listenerMethod)(TArgumentsType&)){
         hEvent * event = addEvent("english", eventName);
@@ -199,40 +199,40 @@ public :
 
     std::string serialize(hEventArgs& args, bool fixedNotation, int digits);
 	// Transform the arguments of an event to a string (including the message at the beginning)
-	
+
 	// If 'fixedNotation' = false, 'digits' specifies the maximum number of meaningful digits to display
 	// in total counting both those before and those after the decimal point
-	
+
 	// If 'fixedNotation' = false, 'digits' specifies exactly how many digits to display after the decimal point,
 	// even if this includes trailing decimal zeros.
-	
+
 	// Since we use doubles, digits can be up to 15, more will display junk.
 
     std::string unserialize(std::string fullMessage, hEventArgs&args);
 	// Transform a string to event arguments (find words, decimal numbers and hexadecimal numbers)
 	// Store all parameters in &args (including the message at the beginning)
 	// Return also the message
-	
+
 	// ---------------------------------------------------------------
 	// Standard Listeners: (used by the gui, but can be used by other objects too)
 	// ---------------------------------------------------------------
-	
+
     void argTest(hEventArgs& args);
 	// Test Listener: display the arguments when the message "arg.test" is received
 
 	void setValue(hEventArgs& args);
 	void setValue2(hEventArgs& args);
-	
+
 	void setXY(hEventArgs& args);
 	void setTime(hEventArgs& args);
-	
+
 	void setLabel(hEventArgs& args);
 	void clearLabel(hEventArgs& args);
-	
+
 	void setText(hEventArgs& args);
 	void addText(hEventArgs& args);
 	void clearText(hEventArgs& args);
-	
+
 	void open(hEventArgs& args);
 	void close(hEventArgs& args);
 
@@ -247,35 +247,34 @@ public :
 	void selectElement(hEventArgs& args);
 	void unselectElement(hEventArgs& args);
 	void elementSetSelected(hEventArgs& args);
-	
+
 	void selectItem(hEventArgs& args);
 	void unselectItem(hEventArgs& args);
 	void itemSetSelected(hEventArgs& args);
 
 	void bang(hEventArgs& args);
-	
+
 	// ---------------------------------------------------------------
 	// Other Usefull Listeners:
 	// ---------------------------------------------------------------
-		
+
 	void setValueToItem(hEventArgs& args);
 	void setValue2ToItem(hEventArgs& args);
 
 	void openItem(hEventArgs& args);
 	void closeItem(hEventArgs& args);
 	void answerDialog(hEventArgs& args);
-	
+
 
 	void start(hEventArgs& args);
 	void stop(hEventArgs& args);
 	void cont(hEventArgs& args);
-	
+
 	// ---------------------------------------------------------------
 
 	bool events_disabled;
 	bool verbose;
 };
-
 
 // ---------------------------------------------------------------
 
